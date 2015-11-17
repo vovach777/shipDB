@@ -104,8 +104,8 @@ void db_load() {
 }
 
 void db_copy(){
-  if (ship_ptr)  {
-      memcpy(&clipboard, &ship);
+  if ((ship_ptr) && (&clipboard != ship_ptr))  {
+      memcpy(&clipboard, &ship, SHIP_SIZE);
       hasclipboard = true;
   }
 }

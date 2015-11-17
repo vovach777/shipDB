@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#pragma pack(1)
 typedef struct ship_tag {
    bool isDeleted;
    int your;
@@ -12,12 +13,23 @@ typedef size_t cursor_t;
 bool db_open(char * fileName);
 void db_close();
 
-cursor_t db_first();
-cursor_t db_next();
-cursor_t db_prev();
-bool     db_is_deleted();
+void db_first();
+void db_next();
+void db_prev();
+void db_last();
+void db_set_cursor(cursor_t c);
+cursor_t db_get_cursor();
+cursor_t db_get_begin();
 
-ship_ptr_t db_curr();
+
+cursor_t db_get_end();
+bool db_is_deleted();
+
+
+ship_ptr_t db_ship(); //last load or save
+
 void db_delete();
 void db_save();
 void db_load();
+void db_copy();
+void db_paste();
