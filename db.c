@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <strings.h>
 #include "db.h"
 
@@ -18,12 +18,12 @@ bool db_open(char * fileName) {
     cursor = 0;
     max_cursor = 0;
     ship_ptr = NULL;
-    memset(&ship,0, SHIP_SIZE)
+    memset(&ship,0, SHIP_SIZE);
     file = fopen(fileName, "r+b");
     if (file == NULL)
        file = fopen(fileName, "w+b");
     if ((file != NULL) &&
-       (fseek(file, 0, SEEK_END) == 0) {
+       (fseek(file, 0, SEEK_END) == 0)) {
       max_cursor = ftell(file);
     }
     return (file != NULL);
@@ -37,12 +37,10 @@ void db_close() {
 
 void db_first() {
   cursor = 0;
-  return cursor;
 }
 
 void db_last() {
   cursor = (max_cursor >= SHIP_SIZE) ? (max_cursor-SHIP_SIZE) : 0;
-  return (cursor);
 }
 
 void db_next() {
@@ -82,7 +80,7 @@ void db_delete() {
 }
 void db_save() {
   if (ship_ptr) {
-    if ((FILE != NULL) &&
+    if ((file != NULL) &&
         (fseek(file, cursor, SEEK_SET) == 0) &&
         (ftell(file) == cursor) &&
         (fwrite(ship_ptr,SHIP_SIZE,1,file) == 1)) {
@@ -94,7 +92,7 @@ void db_save() {
 }
 void db_load() {
   ship_ptr = NULL;
-    if ((FILE) &&
+    if ((file) &&
        (fseek(file, cursor, SEEK_SET) == 0) &&
         (ftell(file) == cursor) &&
         (fread(&ship,SHIP_SIZE,1,file) == 1))
