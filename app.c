@@ -64,7 +64,8 @@ int main(void) {
     puts("вот команды, которые вам понадобятся для работы:");
     show_help();
     
-    while (1)
+    while (1) {
+    putchar('>'); fflush(stdout);
     switch (input()) {
         case HELP:
               show_help();
@@ -116,5 +117,6 @@ int main(void) {
 		        return 0; 
 
     }
+}
 
 }
