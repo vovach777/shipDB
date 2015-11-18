@@ -1,11 +1,13 @@
+#pragma once
 #include <stdbool.h>
-#pragma pack(1)
+#include <stdlib.h>
+#pragma pack(push,1)
 typedef struct ship_tag {
    bool isDeleted;
-   int your;
+   int year;
    char name[64];
 } *ship_ptr_t, ship_t;
-
+#pragma pack(pop)
 #define SHIP_SIZE sizeof(ship_t)
 
 typedef size_t cursor_t;

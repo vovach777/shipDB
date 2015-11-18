@@ -1,0 +1,1 @@
+gcc -fexec-charset=cp866 -finput-charset=utf-8 app.c db.c -o shipDB.exe 2>errors.txt

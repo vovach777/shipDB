@@ -10,15 +10,12 @@ cursor_t max_cursor = 0;
 bool hasclipboard = false;
 
 static void error(char * message) {
-  fprintf(stderr,"ERROR: %s!\n", message);
+  fprintf(stderr,"ERROR (%d): %s!\n", errno, message);
   ship_ptr = NULL;
 }
 
 bool db_open(char * fileName) {
-    cursor = 0;
-    max_cursor = 0;
-    ship_ptr = NULL;
-    memset(&ship,0, SHIP_SIZE);
+    db_close();  
     file = fopen(fileName, "r+b");
     if (file == NULL)
        file = fopen(fileName, "w+b");
@@ -26,10 +23,16 @@ bool db_open(char * fileName) {
        (fseek(file, 0, SEEK_END) == 0)) {
       max_cursor = ftell(file);
     }
+    if (file == NULL)
+      error("can not open");
     return (file != NULL);
 }
 
 void db_close() {
+  cursor = 0;
+  max_cursor = 0;
+  ship_ptr = NULL;
+  memset(&ship,0, SHIP_SIZE);
   if (file)
     fclose(file);
   file = NULL;
