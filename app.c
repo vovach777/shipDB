@@ -6,12 +6,20 @@
 
 void show() {
    if (db_ship()) {
-       printf("корабль: \"%s\" (%d)\n", db_ship()->name, db_ship()->year);
+            printf("+--------------- - -");
+            printf("| Название: %s", db_ship()->name);
+            printf("| Постоен: %d году", db_ship()->year);
+            printf("+--------------- - -");
    }
+   else
+    puts("== нет записи для просмотра ==");
 }
 
 enum CID {
-    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, EDIT, REMOVE, COPY, PASTE, EXIT 
+    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, EDIT, REMOVE, COPY, PASTE, EXIT, ADD, SHOW,
+    NEW,
+    SET_NAME,
+    SET_YEAR
 };
 
 typedef struct Command_tag {
@@ -20,7 +28,7 @@ typedef struct Command_tag {
    enum CID cid;
 } cmd_t;
 
-#define CMD_COUNT 10
+#define CMD_COUNT 15
 cmd_t commands[CMD_COUNT] = {
     {"help", "Выводит эту помощь:", HELP},
     {"open", "Открыть базу", OPEN},
@@ -31,6 +39,11 @@ cmd_t commands[CMD_COUNT] = {
     {"edit", "Режим редактирования", EDIT},
     {"remove", "Удалить запись", REMOVE},
     {"copy", "Скопироваться запись в буффер обмена",COPY},
+    {"save", "Сохранить отредактированную запись", ADD},
+    {"show", "Показать текущую запись", SHOW},
+    {"set_name", "Установить имя", SET_NAME},
+    {"set_year", "Установить год", SET_YEAR},  
+    {"new","создать новую запись", NEW},
     {"exit","Закончить работу с программой", EXIT}
 };
 
@@ -40,18 +53,20 @@ void show_help() {
     }
 }
 
+char command_buff[64];
 
-char command_buff[16];
-
-
-enum CID input() {    
-    fgets(command_buff, sizeof(command_buff), stdin);
+char * input_str() {
+fgets(command_buff, sizeof(command_buff), stdin);
     int i = strlen(command_buff)-1; 
       while ((i >= 0) && ((command_buff[i]=='\n')||(command_buff[i]=='\r')))
          command_buff[i--] = '\0';
+    return command_buff;
+}
 
+enum CID input() {    
+    char * cmd = input_str();       
     for (int i=0; i<CMD_COUNT; i++) {
-       if (strcmp(commands[i].command, command_buff)==0) 
+       if (strcmp(commands[i].command, cmd)==0) 
            return(commands[i].cid);
     }
     return NOPE;
@@ -61,12 +76,27 @@ enum CID input() {
 int main(void) {
     
     puts("Добропожаловать в программу базы кораблей!");
+    db_ship();
     puts("вот команды, которые вам понадобятся для работы:");
     show_help();
     
     while (1) {
     putchar('>'); fflush(stdout);
     switch (input()) {
+        case NOPE:
+              puts("-- команда не распознана --");
+              break;
+        case SET_NAME:
+
+              printf("Имя>"); fflush(stdout); 
+              if (db_ship())
+                strncpy(db_ship()->name,input_str(),64);
+            break;
+        case NEW:
+             db_new();
+             show();            
+             break;
+
         case HELP:
               show_help();
               break;
@@ -113,6 +143,8 @@ int main(void) {
 	    	    puts("-- первая запись --");
 	    	    goto first;	    	    
 		        break;
+        case ADD:
+                break;
 		case EXIT:
 		        return 0; 
 

@@ -31,6 +31,7 @@ bool db_is_deleted();
 ship_ptr_t db_ship(); //last load or save
 
 void db_delete();
+void db_new();
 void db_save();
 void db_load();
 void db_copy();

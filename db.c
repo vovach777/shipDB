@@ -82,6 +82,10 @@ void db_delete() {
   }
 }
 void db_save() {
+  printf("cursor: %d, max_cursor: %d\n", cursor, max_cursor);
+  printf("seek => %d\n", fseek(file, cursor, SEEK_SET)  );
+  printf("tell => %d\n", ftell(file) );
+
   if (ship_ptr) {
     if ((file != NULL) &&
         (fseek(file, cursor, SEEK_SET) == 0) &&
@@ -115,4 +119,17 @@ void db_paste() {
       ship_ptr = &clipboard;
       db_save();
    }
+}
+
+void db_new() {    
+   db_first();
+   while (db_get_cursor() != db_get_end()) { 
+     db_load();
+     if (db_is_deleted())
+        break; 
+   }
+   memset(&ship, 0, SHIP_SIZE);
+   ship_ptr = &ship;
+   ship_ptr->isDeleted = false;
+   db_save();
 }
