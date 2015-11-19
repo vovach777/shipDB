@@ -79,6 +79,7 @@ void db_delete() {
   if (ship_ptr) {
       ship_ptr->isDeleted = true;
       db_save();
+      ship_ptr = NULL;
   }
 }
 void db_save() {

@@ -100,6 +100,9 @@ void process_commands(enum CID cid) {
              db_new();
              show();            
              break;
+        case REMOVE:
+                db_delete();        
+                break;
         case SAVE:
               db_save();
              break; 
