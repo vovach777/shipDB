@@ -1,23 +1,23 @@
 //gcc -fexec-charset=cp866 -finput-charset=utf-8 app.c db.c
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include "db.h"
 
 
 void show() {
    if (db_ship()) {
-            printf("+--------------- - -");
-            printf("| Название: %s", db_ship()->name);
-            printf("| Постоен: %d году", db_ship()->year);
-            printf("+--------------- - -");
+            printf("+----------\n");
+            printf("| Название: %s\n", db_ship()->name);
+            printf("| Построен: %d год\n", db_ship()->year);
+            printf("+----------\n");
    }
    else
     puts("== нет записи для просмотра ==");
 }
 
 enum CID {
-    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, EDIT, REMOVE, COPY, PASTE, EXIT, ADD, SHOW,
-    NEW,
+    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, EDIT, REMOVE, COPY, PASTE, EXIT, SHOW,
+    NEW, SAVE,
     SET_NAME,
     SET_YEAR
 };
@@ -39,7 +39,7 @@ cmd_t commands[CMD_COUNT] = {
     {"edit", "Режим редактирования", EDIT},
     {"remove", "Удалить запись", REMOVE},
     {"copy", "Скопироваться запись в буффер обмена",COPY},
-    {"save", "Сохранить отредактированную запись", ADD},
+    {"save", "Сохранить отредактированную запись", SAVE},
     {"show", "Показать текущую запись", SHOW},
     {"set_name", "Установить имя", SET_NAME},
     {"set_year", "Установить год", SET_YEAR},  
@@ -73,82 +73,103 @@ enum CID input() {
  }
 
 
+void process_commands(enum CID cid) {
+    switch (cid) {
+        case NOPE:
+              puts("-- команда не распознана --");
+              break;
+        case SET_NAME:              
+              if (db_ship()) {
+                printf("Имя>");
+                strncpy(db_ship()->name,input_str(),64);
+                show();
+          }
+            break;
+        case SET_YEAR:
+              if (db_ship()) {
+                printf("Год>");
+                db_ship()->year = strtoul( input_str(),NULL, 10);
+                show();
+          }
+            break;  
+        case SHOW:
+            show();
+            break;
+
+        case NEW:
+             db_new();
+             show();            
+             break;
+        case SAVE:
+              db_save();
+             break; 
+
+        case HELP:
+              show_help();
+              break;
+        case OPEN:
+                db_open("ships.db");
+                break;
+        case CLOSE:
+                db_close();
+                break;
+        case  FIRST:
+                first:
+                db_first();
+                while (db_get_cursor() != db_get_end()) {                   
+                   db_load();
+                   if (!db_is_deleted()) {
+                       show();
+                       return;
+                   }                   
+                   db_next();
+                }
+                puts("-- в базе нет записей. --");                
+                break;
+        case  NEXT: 
+                db_next();
+                while (db_get_cursor() != db_get_end()) {
+                    db_load();
+                    if (!db_is_deleted()) {
+                       show();
+                       return;
+                   }
+                   db_next();
+                }
+                puts("-- больше записей нет. перемотка в начало. --");
+                goto first;                 
+        case PREV:              
+                while (db_get_cursor() != db_get_begin()) {
+                   db_prev();
+                   db_load();
+                   if (!db_is_deleted()) {
+                       show();
+                       return;
+                   }
+                }
+                puts("-- первая запись --");                
+                goto first;             
+                break;
+        default:
+            printf("== команда не обработана ==");
+
+    }    
+}
+
+
 int main(void) {
-    
+    enum CID cid;
     puts("Добропожаловать в программу базы кораблей!");
     db_ship();
     puts("вот команды, которые вам понадобятся для работы:");
     show_help();
     
     while (1) {
-    putchar('>'); fflush(stdout);
-    switch (input()) {
-        case NOPE:
-              puts("-- команда не распознана --");
-              break;
-        case SET_NAME:
-
-              printf("Имя>"); fflush(stdout); 
-              if (db_ship())
-                strncpy(db_ship()->name,input_str(),64);
-            break;
-        case NEW:
-             db_new();
-             show();            
-             break;
-
-        case HELP:
-              show_help();
-              break;
-    	case OPEN:
-    	        db_open("ships.db");
-    	        break;
-    	case CLOSE:
-    			db_close();
-    			break;
-    	case  FIRST:
-    			first:
-    			db_first();
-    			while (db_get_cursor() != db_get_end()) {	    	        
-    	           db_load();
-    	           if (!db_is_deleted()) {
-    	           	   show();
-    	           	   break;
-    	           }
-    	           db_next();
-	    	    }
-	    	    puts("-- в базе нет записей. --");
-		        break;
-    	case  NEXT:    			
-    			while (db_get_cursor() != db_get_end()) {	    	        
-    				db_next();
-    	            db_load();
-    	            if (!db_is_deleted()) {
-    	           	   show();
-    	           	   break;
-    	           }
-	    	    }
-	    	    puts("-- больше записей нет. перемотка в начало. --");
-	    	    goto first;	
-		        break;
-		case PREV:				
-    			while (db_get_cursor() != db_get_begin()) {
-    			   db_prev();
-    	           db_load();
-    	           if (!db_is_deleted()) {
-    	           	   show();
-    	           	   break;
-    	           }
-	    	    }
-	    	    puts("-- первая запись --");
-	    	    goto first;	    	    
-		        break;
-        case ADD:
-                break;
-		case EXIT:
-		        return 0; 
-
-    }
+       putchar('>'); //fflush(stdout);
+       cid = input();
+        if (cid == EXIT)
+              return 0;
+       process_commands(cid);
 }
 
 }

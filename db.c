@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include "db.h"
 
 FILE * file = NULL;
@@ -82,20 +82,16 @@ void db_delete() {
   }
 }
 void db_save() {
-  printf("cursor: %d, max_cursor: %d\n", cursor, max_cursor);
-  printf("seek => %d\n", fseek(file, cursor, SEEK_SET)  );
-  printf("tell => %d\n", ftell(file) );
-
-  if (ship_ptr) {
-    if ((file != NULL) &&
+    if ((ship_ptr) &&
+        (file != NULL) &&
         (fseek(file, cursor, SEEK_SET) == 0) &&
         (ftell(file) == cursor) &&
         (fwrite(ship_ptr,SHIP_SIZE,1,file) == 1)) {
           if (max_cursor == cursor)
               max_cursor += SHIP_SIZE; //extend
         }
-         error("can not save");
-  }
+        else
+         error("can not save");  
 }
 void db_load() {
   ship_ptr = NULL;
@@ -127,6 +123,7 @@ void db_new() {
      db_load();
      if (db_is_deleted())
         break; 
+     db_next();
    }
    memset(&ship, 0, SHIP_SIZE);
    ship_ptr = &ship;
