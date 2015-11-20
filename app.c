@@ -16,7 +16,7 @@ void show() {
 }
 
 enum CID {
-    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, REMOVE, COPY, PASTE, EXIT, SHOW,
+    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, REMOVE, COPY, PASTE, EXIT, SHOW, ALL,
     NEW, SAVE, REFRESH,
     SET_NAME,
     SET_YEAR
@@ -28,7 +28,7 @@ typedef struct Command_tag {
    enum CID cid;
 } cmd_t;
 
-#define CMD_COUNT 15
+#define CMD_COUNT 16
 cmd_t commands[CMD_COUNT] = {
     {"help", "Выводит эту помощь:", HELP},
     {"open", "Открыть базу", OPEN},
@@ -44,6 +44,7 @@ cmd_t commands[CMD_COUNT] = {
     {"set_name", "Установить имя", SET_NAME},
     {"set_year", "Установить год", SET_YEAR},  
     {"new","создать новую запись", NEW},
+    {"all","вывести все записи", ALL},
     {"exit","Закончить работу с программой", EXIT}
 };
 
@@ -74,6 +75,8 @@ enum CID input() {
 
 
 void process_commands(enum CID cid) {
+    cursor_t old_c;
+    char * dbName;
     switch (cid) {
         case NOPE:
               puts("-- команда не распознана --");
@@ -92,6 +95,18 @@ void process_commands(enum CID cid) {
                 show();
           }
             break;
+        case ALL:
+             old_c = db_get_cursor();
+             db_first();             
+             while (db_get_cursor() != db_get_end()) {
+                 db_load();
+                 if (!db_is_deleted())
+                    show();
+                 db_next();
+             }
+             db_set_cursor(old_c);
+             db_load();
+             break;
         case REFRESH:
              db_load();
         case SHOW:
@@ -112,8 +127,10 @@ void process_commands(enum CID cid) {
         case HELP:
               show_help();
               break;
-        case OPEN:
-                db_open("ships.db");
+        case OPEN:        
+                printf("Файл>");
+                dbName = input_str();
+                db_open( strlen(dbName) == 0 ?  "ships.db" : dbName);
                 break;
         case CLOSE:
                 db_close();
