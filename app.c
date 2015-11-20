@@ -101,7 +101,7 @@ void process_commands(enum CID cid) {
              break;
         case PASTE:
              db_paste();
-             db_show();
+             show();
              break;
         case ALL:
              old_c = db_get_cursor();
