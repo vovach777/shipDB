@@ -28,7 +28,7 @@ typedef struct Command_tag {
    enum CID cid;
 } cmd_t;
 
-#define CMD_COUNT 16
+#define CMD_COUNT 17
 cmd_t commands[CMD_COUNT] = {
     {"help", "Выводит эту помощь:", HELP},
     {"open", "Открыть базу", OPEN},
@@ -36,14 +36,15 @@ cmd_t commands[CMD_COUNT] = {
     {"first", "Перейти к первой записи", FIRST},
     {"next", "Перейти к следующей записи", NEXT},
     {"prev", "Перейти к предыдущей записи", PREV},
+    {"new","Cоздать новую запись", NEW},    
     {"remove", "Удалить запись", REMOVE},
+    {"set_name", "Установить имя", SET_NAME},
+    {"set_year", "Установить год", SET_YEAR},  
     {"copy", "Скопироваться запись в буффер обмена",COPY},
+    {"paste", "Вставить из буффера обмена",PASTE},
     {"save", "Сохранить отредактированную запись", SAVE},
     {"show", "Показать текущую запись", SHOW},
     {"load", "Перечитать запись", REFRESH},
-    {"set_name", "Установить имя", SET_NAME},
-    {"set_year", "Установить год", SET_YEAR},  
-    {"new","создать новую запись", NEW},
     {"all","вывести все записи", ALL},
     {"exit","Закончить работу с программой", EXIT}
 };
@@ -95,6 +96,13 @@ void process_commands(enum CID cid) {
                 show();
           }
             break;
+        case COPY:
+             db_copy();
+             break;
+        case PASTE:
+             db_paste();
+             db_show();
+             break;
         case ALL:
              old_c = db_get_cursor();
              db_first();             
