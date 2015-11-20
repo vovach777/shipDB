@@ -16,8 +16,8 @@ void show() {
 }
 
 enum CID {
-    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, EDIT, REMOVE, COPY, PASTE, EXIT, SHOW,
-    NEW, SAVE,
+    NOPE, HELP, OPEN, CLOSE, FIRST, NEXT, PREV, REMOVE, COPY, PASTE, EXIT, SHOW,
+    NEW, SAVE, REFRESH,
     SET_NAME,
     SET_YEAR
 };
@@ -36,11 +36,11 @@ cmd_t commands[CMD_COUNT] = {
     {"first", "Перейти к первой записи", FIRST},
     {"next", "Перейти к следующей записи", NEXT},
     {"prev", "Перейти к предыдущей записи", PREV},
-    {"edit", "Режим редактирования", EDIT},
     {"remove", "Удалить запись", REMOVE},
     {"copy", "Скопироваться запись в буффер обмена",COPY},
     {"save", "Сохранить отредактированную запись", SAVE},
     {"show", "Показать текущую запись", SHOW},
+    {"load", "Перечитать запись", REFRESH},
     {"set_name", "Установить имя", SET_NAME},
     {"set_year", "Установить год", SET_YEAR},  
     {"new","создать новую запись", NEW},
@@ -91,7 +91,9 @@ void process_commands(enum CID cid) {
                 db_ship()->year = strtoul( input_str(),NULL, 10);
                 show();
           }
-            break;  
+            break;
+        case REFRESH:
+             db_load();
         case SHOW:
             show();
             break;
@@ -154,7 +156,7 @@ void process_commands(enum CID cid) {
                 goto first;             
                 break;
         default:
-            printf("== команда не обработана ==");
+            puts("== команда не обработана ==");
 
     }    
 }
